@@ -2,8 +2,11 @@ public class QuestionThree
 {
 	public static void main(String[] args)
 	{
+		// Write a program to implement the AVL Tree in Java for the given set of elements and print the
+		// post-order traversal for the tree
+		// 7,18,3,22,4,24,29,10,2,89
+		int[] x = {7, 18, 3, 22, 4, 24, 29, 10, 2, 89};
 		AVLTree<Integer> avlTree = new AVLTree<>();
-		int[] x = {4, 2, 1, 3, 5, 6, 7};
 		for (int i : x)
 		{
 			avlTree.add(i);
@@ -11,39 +14,14 @@ public class QuestionThree
 		System.out.println(avlTree.postOrder());
 	}
 
-	private static class AVLTree<T extends Comparable<T>>
+	static class AVLTree<T extends Comparable<T>>
 	{
-		private Node<T> root;
 		protected int size;
+		private Node<T> root;
 
 		AVLTree()
 		{
 			size = 0;
-		}
-
-		public boolean search(T t)
-		{
-			if (root == null)
-			{
-				return false;
-			}
-			Node<T> current = root;
-			while (current != null)
-			{
-				if (current.val.compareTo(t) == 0)
-				{
-					return true;
-				}
-				else if (current.val.compareTo(t) > 0)
-				{
-					current = current.left;
-				}
-				else
-				{
-					current = current.right;
-				}
-			}
-			return false;
 		}
 
 		public String postOrder()
@@ -56,11 +34,18 @@ public class QuestionThree
 
 		}
 
+		private void swapHeights(Node<T> parentNode, Node<T> childNode)
+		{
+			parentNode.updateHeight();
+			childNode.updateHeight();
+		}
+
 		private Node<T> rotateRight(Node<T> node)
 		{
 			Node<T> temp = node.left;
-			node.left = temp != null ? temp.right : null;
+			node.left = temp.right;
 			temp.right = node;
+			swapHeights(node, temp);
 			return temp;
 		}
 
@@ -69,12 +54,26 @@ public class QuestionThree
 			Node<T> temp = node.right;
 			node.right = temp.left;
 			temp.left = node;
+			swapHeights(node, temp);
 			return temp;
 		}
 
-		public boolean add(T t)
+		private Node<T> rotateRightLeft(Node<T> current)
 		{
-			System.out.println("Adding " + t);
+			current.right = rotateRight(current.right);
+			current = rotateLeft(current);
+			return current;
+		}
+
+		private Node<T> rotateLeftRight(Node<T> current)
+		{
+			current.left = rotateLeft(current.left);
+			current = rotateRight(current);
+			return current;
+		}
+
+		public void add(T t)
+		{
 			if (root == null)
 			{
 				root = new Node<>(t);
@@ -84,12 +83,11 @@ public class QuestionThree
 				Node<T> newRoot = insert(root, new Node<>(t));
 				if (newRoot == null)
 				{
-					return false;
+					return;
 				}
 				root = newRoot;
 			}
 			size++;
-			return true;
 		}
 
 		private Node<T> insert(Node<T> current, Node<T> newNode)
@@ -99,30 +97,37 @@ public class QuestionThree
 				return newNode;
 			}
 			int cmp = current.val.compareTo(newNode.val);
-			if (cmp == 0)
-			{
-				return null;
-			}
+			// duplicate elements cannot be inserted
+			assert cmp != 0;
 			if (cmp > 0)
 			{
-				// System.out.println("left insert " + newNode);
 				current.left = insert(current.left, newNode);
 			}
 			else
 			{
 				current.right = insert(current.right, newNode);
-				// System.out.println("right insert of " + current.right);
-				if (current.right.balanceFactor() < -1)
+			}
+			current.updateHeight();
+			if (current.balanceFactor() > 1)
+			{
+				if (current.left.balanceFactor() < 0)
 				{
-					if (newNode.val == current.right.right.val)
-					{
-						current.right = rotateLeft(current.right);
-					}
-					else
-					{
-						current.right.right = rotateRight(current.right.right);
-						current.right = rotateLeft(current.right);
-					}
+					current = rotateLeftRight(current);
+				}
+				else
+				{
+					current = rotateRight(current);
+				}
+			}
+			else if (current.balanceFactor() < -1)
+			{
+				if (current.right.balanceFactor() > 0)
+				{
+					current = rotateRightLeft(current);
+				}
+				else
+				{
+					current = rotateLeft(current);
 				}
 			}
 			return current;
@@ -130,7 +135,8 @@ public class QuestionThree
 
 		private static class Node<T extends Comparable<T>>
 		{
-			T val;
+			protected int height;
+			protected T val;
 			Node<T> left;
 			Node<T> right;
 
@@ -145,30 +151,33 @@ public class QuestionThree
 				int rightHeight = -1;
 				if (left != null)
 				{
-					leftHeight = left.getHeight();
+					leftHeight = left.height;
 				}
 				if (right != null)
 				{
-					rightHeight = right.getHeight();
+					rightHeight = right.height;
 				}
 				return leftHeight - rightHeight;
 			}
 
-			public int getHeight()
+			public void updateHeight()
 			{
 				if (left == null && right == null)
 				{
-					return 0;
+					height = 0;
+					return;
 				}
 				if (left == null)
 				{
-					return 1 + right.getHeight();
+					height = 1 + right.height;
+					return;
 				}
 				if (right == null)
 				{
-					return 1 + left.getHeight();
+					height = 1 + left.height;
+					return;
 				}
-				return 1 + Integer.max(left.getHeight(), right.getHeight());
+				height = 1 + Integer.max(left.height, right.height);
 			}
 
 			public String postOrder()
@@ -191,10 +200,8 @@ public class QuestionThree
 			@Override
 			public String toString()
 			{
-				return "Node( val: " + this.val + " balance: " + this.balanceFactor() + ")";
+				return "Node(" + val + ")";
 			}
-
 		}
-
 	}
 }

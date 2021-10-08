@@ -26,7 +26,7 @@ public class QuestionTwo
 			Node<Integer>[] result = (Node<Integer>[]) new Node[nums.length];
 			for (int i = 0; i < nums.length; i++)
 			{
-				result[i] = new Node(nums[i]);
+				result[i] = new Node<>(nums[i]);
 			}
 			return result;
 		}
