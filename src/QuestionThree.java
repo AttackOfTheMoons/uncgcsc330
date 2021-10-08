@@ -14,7 +14,7 @@ public class QuestionThree
 		System.out.println(avlTree.postOrder());
 	}
 
-	static class AVLTree<T extends Comparable<T>>
+	public static class AVLTree<T extends Comparable<T>>
 	{
 		protected int size;
 		private Node<T> root;
@@ -31,7 +31,15 @@ public class QuestionThree
 				return "[]";
 			}
 			return "[" + root.postOrder() + "]";
+		}
 
+		public String inOrder()
+		{
+			if (size == 0)
+			{
+				return "[]";
+			}
+			return "[" + root.inOrder() + "]";
 		}
 
 		private void swapHeights(Node<T> parentNode, Node<T> childNode)
@@ -185,15 +193,28 @@ public class QuestionThree
 				StringBuilder stringBuilder = new StringBuilder();
 				if (this.left != null)
 				{
-					stringBuilder.append(this.left.postOrder());
-					stringBuilder.append(", ");
+					stringBuilder.append(this.left.postOrder()).append(", ");
 				}
 				if (this.right != null)
 				{
-					stringBuilder.append(this.right.postOrder());
-					stringBuilder.append(", ");
+					stringBuilder.append(this.right.postOrder()).append(", ");
 				}
 				stringBuilder.append(this);
+				return stringBuilder.toString();
+			}
+
+			public String inOrder()
+			{
+				StringBuilder stringBuilder = new StringBuilder();
+				if (this.left != null)
+				{
+					stringBuilder.append(this.left.inOrder()).append(", ");
+				}
+				stringBuilder.append(this);
+				if (this.right != null)
+				{
+					stringBuilder.append(", ").append(this.right.inOrder());
+				}
 				return stringBuilder.toString();
 			}
 
