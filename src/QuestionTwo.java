@@ -9,7 +9,7 @@ public class QuestionTwo
 
 	private static class QuestionTwoTree
 	{
-		private Node<Integer> root;
+		private final Node<Integer> root;
 
 		QuestionTwoTree()
 		{
@@ -21,12 +21,13 @@ public class QuestionTwo
 			root.children[1].children[0].children = newArray(4);
 		}
 
-		private Node<Integer>[] newArray(Integer... nums)
+		private Node<Integer>[] newArray(Integer... numbers)
 		{
-			Node<Integer>[] result = (Node<Integer>[]) new Node[nums.length];
-			for (int i = 0; i < nums.length; i++)
+			// Not best practice, this is a limitation of Java.
+			Node<Integer>[] result = (Node<Integer>[]) new Node[numbers.length];
+			for (int i = 0; i < numbers.length; i++)
 			{
-				result[i] = new Node<>(nums[i]);
+				result[i] = new Node<>(numbers[i]);
 			}
 			return result;
 		}

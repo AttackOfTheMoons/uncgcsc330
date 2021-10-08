@@ -144,7 +144,7 @@ public class QuestionThree
 		private static class Node<T extends Comparable<T>>
 		{
 			protected int height;
-			protected T val;
+			protected final T val;
 			Node<T> left;
 			Node<T> right;
 
@@ -221,7 +221,7 @@ public class QuestionThree
 			@Override
 			public String toString()
 			{
-				return "Node(" + val + ")";
+				return "" + val ;
 			}
 		}
 	}
